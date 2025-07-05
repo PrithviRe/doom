@@ -109,7 +109,9 @@ class Player:
             pg.mouse.set_pos([HALF_WIDTH, HALF_HEIGHT])
         self.rel = pg.mouse.get_rel()[0]
         self.rel = max(-MOUSE_MAX_REL, min(MOUSE_MAX_REL, self.rel))
-        self.angle += self.rel * MOUSE_SENSITIVITY * self.game.delta_time
+        # Use sensitivity from pause menu if available, otherwise use default
+        sensitivity = self.game.pause_menu.get_sensitivity() if hasattr(self.game, 'pause_menu') else MOUSE_SENSITIVITY
+        self.angle += self.rel * sensitivity * self.game.delta_time
 
     def update(self):
         self.movement()

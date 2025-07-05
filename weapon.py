@@ -14,14 +14,16 @@ class Weapon(AnimatedSprite):
                 "scale": 0.4,
                 "animation_time": 90,
                 "damage": 50,
-                "sound": "shotgun.wav"
+                "sound": "shotgun.wav",
+                "range": 10.0  # Long range
             },
             "knife": {
                 "path": "resources/sprites/weapon/knife/",
                 "scale": 5.0,
                 "animation_time": 60,
                 "damage": 100,
-                "sound": "knife.wav"
+                "sound": "knife.wav",
+                "range": 2.0  # Short range - melee weapon
             }
         }
 
@@ -42,6 +44,7 @@ class Weapon(AnimatedSprite):
         self.weapon_pos = (HALF_WIDTH - self.images[0].get_width() // 2,
                            HEIGHT - self.images[0].get_height())
         self.damage = weapon["damage"]
+        self.range = weapon["range"]
         self.animation_time = weapon["animation_time"]
         self.sound_file = weapon["sound"]
         self.num_images = len(self.images)

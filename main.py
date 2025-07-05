@@ -1,5 +1,6 @@
 import pygame as pg
 import sys
+import threading
 from settings import *
 from map import *
 from player import *
@@ -10,7 +11,7 @@ from object_handler import *
 from weapon import *
 from sound import *
 from pathfinding import *
-
+from mouse import VirtualMouse  # Import the VirtualMouse class
 
 class Game:
     def __init__(self):
@@ -23,6 +24,12 @@ class Game:
         self.global_trigger = False
         self.global_event = pg.USEREVENT + 0
         pg.time.set_timer(self.global_event, 40)
+
+        # Start the virtual mouse in a separate thread
+        self.virtual_mouse = VirtualMouse()
+        self.mouse_thread = threading.Thread(target=self.virtual_mouse.run, daemon=True)
+        self.mouse_thread.start()
+
         self.new_game()
 
     def new_game(self):
@@ -37,20 +44,33 @@ class Game:
         pg.mixer.music.play(-1)
 
     def update(self):
+    # Hand gesture → Rotate player view
+        if self.virtual_mouse.index_coords:
+            dx = (self.virtual_mouse.index_coords[0] - self.virtual_mouse.prev_index_x) * 0.005
+            self.player.angle += dx
+            self.virtual_mouse.prev_index_x = self.virtual_mouse.index_coords[0]
+
+        # Hand gesture → Fire weapon
+        if self.virtual_mouse.fist_flag:
+            if not self.player.shot and not self.weapon.reloading:
+                self.player.shot = True
+                self.weapon.fire()
+
+        else:
+            self.player.shot = False  # Reset shot flag when gesture ends
+
         self.player.update()
         self.raycasting.update()
         self.object_handler.update()
         self.weapon.update()
         pg.display.flip()
         self.delta_time = self.clock.tick(FPS)
-        pg.display.set_caption(f'{self.clock.get_fps() :.1f}')
+        pg.display.set_caption(f'{self.clock.get_fps():.1f}')
+
 
     def draw(self):
-        # self.screen.fill('black')
         self.object_renderer.draw()
         self.weapon.draw()
-        # self.map.draw()
-        # self.player.draw()
 
     def check_events(self):
         self.global_trigger = False

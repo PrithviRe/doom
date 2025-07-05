@@ -1,1 +1,5 @@
 pygame
+opencv-contrib-python
+opencv-python 
+mediapipe 
+PyAutoGUI
